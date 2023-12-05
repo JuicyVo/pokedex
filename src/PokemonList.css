@@ -1,0 +1,24 @@
+.pokemon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pokemon-square {
+  width: 100px;
+  height: 150px; 
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.pokemon-square img {
+  width: 80px; 
+  height: 80px; 
+  margin-bottom: 5px; 
+}
