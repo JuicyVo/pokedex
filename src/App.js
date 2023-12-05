@@ -16,9 +16,9 @@ function App() {
           const pokemonDetailResponse = await axios.get(p.url);
           const types = pokemonDetailResponse.data.types.map(type => type.type.name);
           return {
-            name: p.name,
+            name: capitalizeFirstLetter(p.name),
             sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.url.split("/")[6]}.png`,
-            types: types.join(", "),
+            types,
           };
         }));
         setAllPokemon(pokemonData);
@@ -31,13 +31,17 @@ function App() {
     fetchData();
   }, []);
 
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   const handleSearch = (e) => {
     const searchValue = e.target.value.toLowerCase();
     setSearchTerm(searchValue);
 
     const filtered = allPokemon.filter((pokemon) =>
       pokemon.name.toLowerCase().includes(searchValue) ||
-      pokemon.types.toLowerCase().includes(searchValue)
+      pokemon.types.some(type => type.includes(searchValue))
     );
 
     setFilteredPokemon(filtered);

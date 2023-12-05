@@ -1,24 +1,26 @@
+/* Add this to your CSS file */
 .pokemon-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
 }
 
-.pokemon-square {
-  width: 100px;
-  height: 150px; 
-  display: flex;
-  flex-direction: column; 
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
+.pokemon-card {
+  text-align: center;
+  padding: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-weight: bold;
 }
 
-.pokemon-square img {
-  width: 80px; 
-  height: 80px; 
-  margin-bottom: 5px; 
+.pokemon-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.pokemon-name {
+  margin-top: 8px;
+}
+
+.types {
+  margin-top: 8px;
 }
