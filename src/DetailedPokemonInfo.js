@@ -8,6 +8,12 @@ function capitalizeEachWord(str) {
     .join(" ");
 }
 
+function getTypeIconSrc(type) {
+  const iconPath = `/icons/pokemon/types/${type}.png`;
+  console.log('Icon Path:', iconPath);
+  return iconPath;
+}
+
 function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, onNextClick }) {
   const [evolutionChain, setEvolutionChain] = useState([]);
   const [abilities, setAbilities] = useState([]);
@@ -61,7 +67,7 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
       }
     };
 
-   
+    
     if (selectedPokemon) {
       fetchEvolutionChain();
       fetchAbilities();
@@ -69,9 +75,8 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
   }, [selectedPokemon]);
 
   const getStatPercentage = (statValue) => {
-    //mess with this to make the pokemon stats look more green or not
     const maxStatValue = 70;
-    const fullWidth = 50; // 
+    const fullWidth = 50;
     const percentage = (statValue / maxStatValue) * fullWidth;
     return Math.max(percentage, 10);
   };
@@ -80,20 +85,38 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
     <div>
       <h2>{selectedPokemon.name}</h2>
       <img src={selectedPokemon.sprite} alt={selectedPokemon.name} />
+      <div>
+        <h3>Type:</h3>
+        <div style={{ marginTop: '8px' }}>
+          {selectedPokemon.types.map((type) => (
+            <img
+              key={type}
+              src={getTypeIconSrc(type)}
+              alt={type}
+              style={{ maxWidth: '24px', height: 'auto', marginRight: '4px' }}
+            />
+          ))}
+        </div>
+      </div>
       <h3>Evolution Chain:</h3>
       <ul>
         {evolutionChain.map((evolution) => (
           <li key={evolution.id}>{capitalizeEachWord(evolution.name)}</li>
         ))}
       </ul>
-
+      
       <div>
         <h3>Abilities:</h3>
         <ul>
-          {abilities.map((ability, index) => (
-            <li key={index}>{capitalizeEachWord(ability.name)}</li>
-          ))}
-        </ul>
+  {selectedPokemon.abilities.map((ability, index) => (
+    <li key={index}>
+      {capitalizeEachWord(ability.replace(/-/g, ' '))}
+    </li>
+  ))}
+</ul>
+
+
+
 
         <h3>Individual Stats:</h3>
         <ul>
@@ -114,7 +137,6 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
           ))}
         </ul>
       </div>
-
       <button onClick={onBackClick}>Back to Pokedex</button>
       <button onClick={onPreviousClick}>Previous Pokemon</button>
       <button onClick={onNextClick}>Next Pokemon</button>
