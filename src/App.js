@@ -2,23 +2,44 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "./Header";
 import PokemonList from "./PokemonList";
+import DetailedPokemonInfo from "./DetailedPokemonInfo";
 
 function App() {
   const [allPokemon, setAllPokemon] = useState([]);
   const [filteredPokemon, setFilteredPokemon] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://pokeapi.co/api/v2/pokemon?limit=1048");
+        const response = await axios.get("https://pokeapi.co/api/v2/pokemon?limit=151");
         const pokemonData = await Promise.all(response.data.results.map(async (p) => {
           const pokemonDetailResponse = await axios.get(p.url);
+
+  
+          const stats = pokemonDetailResponse.data.stats.map(stat => ({
+            name: stat.stat.name,
+            value: stat.base_stat,
+          }));
+
+          const abilities = pokemonDetailResponse.data.abilities.map(ability => ability.ability.name);
+
           const types = pokemonDetailResponse.data.types.map(type => type.type.name);
+          const id = pokemonDetailResponse.data.id; 
           return {
+            id, 
             name: capitalizeFirstLetter(p.name),
-            sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.url.split("/")[6]}.png`,
+            sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
             types,
+            species: {
+              url: pokemonDetailResponse.data.species.url,
+            },
+            moves: {
+              url: pokemonDetailResponse.data.moves.url,
+            },
+            stats,
+            abilities,
           };
         }));
         setAllPokemon(pokemonData);
@@ -27,7 +48,7 @@ function App() {
         console.error("Error fetching data:", error.message);
       }
     };
-
+  
     fetchData();
   }, []);
 
@@ -45,6 +66,28 @@ function App() {
     );
 
     setFilteredPokemon(filtered);
+    setSelectedPokemon(null);
+  };
+
+  const handlePokemonClick = (pokemon) => {
+    console.log('Clicked on Pokemon:', pokemon);
+    setSelectedPokemon({ ...pokemon });
+  };
+
+  const handleBackClick = () => {
+    setSelectedPokemon(null);
+  };
+
+  const handleNextClick = () => {
+    const currentIndex = allPokemon.findIndex((pokemon) => pokemon.id === selectedPokemon.id);
+    const nextIndex = (currentIndex + 1) % allPokemon.length;
+    setSelectedPokemon({ ...allPokemon[nextIndex] });
+  };
+
+  const handlePreviousClick = () => {
+    const currentIndex = allPokemon.findIndex((pokemon) => pokemon.id === selectedPokemon.id);
+    const previousIndex = (currentIndex - 1 + allPokemon.length) % allPokemon.length;
+    setSelectedPokemon({ ...allPokemon[previousIndex] });
   };
 
   return (
@@ -58,7 +101,16 @@ function App() {
           onChange={handleSearch}
         />
       </div>
-      <PokemonList pokemon={filteredPokemon} />
+      {selectedPokemon ? (
+        <DetailedPokemonInfo
+          selectedPokemon={selectedPokemon}
+          onBackClick={handleBackClick}
+          onPreviousClick={handlePreviousClick}
+          onNextClick={handleNextClick}
+        />
+      ) : (
+        <PokemonList pokemon={filteredPokemon} onPokemonClick={handlePokemonClick} />
+      )}
     </>
   );
 }
