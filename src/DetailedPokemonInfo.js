@@ -3,10 +3,11 @@ import axios from "axios";
 
 function capitalizeEachWord(str) {
   return str
-    .split(" ")
+    .split(/[\s-]+/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
 
 function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, onNextClick }) {
   const [evolutionChain, setEvolutionChain] = useState([]);
@@ -32,10 +33,6 @@ const fetchAbilities = async () => {
     console.error("Error fetching abilities:", error.message);
   }
 };
-
-    
-    
-    
 
     
     const fetchEvolutionChain = async () => {
@@ -126,9 +123,6 @@ const fetchAbilities = async () => {
         console.error("Error fetching abilities:", error.message);
       }
     };
-    
-    
-    
 
     // Fetch abilities when selectedPokemon changes
     if (selectedPokemon) {
@@ -155,12 +149,15 @@ const fetchAbilities = async () => {
       <h3>Base Stat Total: {baseStatTotal}</h3>
       <div>
         <h3>Abilities:</h3>
+        
         <ul>
         {selectedPokemon.abilities.map((ability, index) => (
           <li key={index}>
-            {ability}
+            {capitalizeEachWord(ability)}
           </li>
         ))}
+      
+
         </ul>
 
         <h3>Individual Stats:</h3>
