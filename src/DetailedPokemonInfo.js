@@ -8,33 +8,11 @@ function capitalizeEachWord(str) {
     .join(" ");
 }
 
-
 function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, onNextClick }) {
   const [evolutionChain, setEvolutionChain] = useState([]);
-  const [moveset, setMoveset] = useState([]);
-  const [baseStatTotal, setBaseStatTotal] = useState(null);
-  const [individualStats, setIndividualStats] = useState([]);
   const [abilities, setAbilities] = useState([]);
 
   useEffect(() => {
-
-const fetchAbilities = async () => {
-  try {
-    if (selectedPokemon?.abilities && Array.isArray(selectedPokemon.abilities)) {
-      const abilitiesData = selectedPokemon.abilities;
-
-      console.log("Abilities Data:", abilitiesData);
-
-      setAbilities(abilitiesData);
-    } else {
-      console.error("Abilities information is not available.");
-    }
-  } catch (error) {
-    console.error("Error fetching abilities:", error.message);
-  }
-};
-
-    
     const fetchEvolutionChain = async () => {
       try {
         const response = await axios.get(selectedPokemon.species.url);
@@ -63,47 +41,6 @@ const fetchAbilities = async () => {
       }
     };
 
-    const fetchMoveset = async () => {
-      try {
-        if (selectedPokemon && selectedPokemon.moves && selectedPokemon.moves.url) {
-          console.log("Moves URL:", selectedPokemon.moves.url);
-          const response = await axios.get(selectedPokemon.moves.url);
-          console.log("Moveset response:", response.data);
-          const moves = response.data.moves.slice(0, 5).map((move) => move.move.name);
-          setMoveset(moves);
-        } else {
-          console.error("Moveset information is not available.");
-        }
-      } catch (error) {
-        console.error("Error fetching moveset:", error.message);
-      }
-    };
-
-    const fetchPokemonDetails = async () => {
-      try {
-        if (selectedPokemon && selectedPokemon.url) {
-          console.log("Pokemon URL:", selectedPokemon.url);
-          const response = await axios.get(selectedPokemon.url);
-          console.log("Pokemon details response:", response.data);
-          setBaseStatTotal(response.data.base_experience);
-          setIndividualStats(response.data.stats);
-        } else {
-          console.error("Pokemon details information is not available.");
-        }
-      } catch (error) {
-        console.error("Error fetching Pokemon details:", error.message);
-      }
-    };
-
-    // Call the data-fetching functions when selectedPokemon changes
-    if (selectedPokemon) {
-      fetchEvolutionChain();
-      fetchMoveset();
-      fetchPokemonDetails();
-    }
-  }, [selectedPokemon]);
-
-  useEffect(() => {
     const fetchAbilities = async () => {
       try {
         if (selectedPokemon?.abilities && Array.isArray(selectedPokemon.abilities)) {
@@ -114,9 +51,9 @@ const fetchAbilities = async () => {
               slot: ability.slot,
             };
           });
-    
+
           console.log("Abilities Data:", abilitiesData);
-    
+
           setAbilities(abilitiesData);
         }
       } catch (error) {
@@ -124,11 +61,20 @@ const fetchAbilities = async () => {
       }
     };
 
-    // Fetch abilities when selectedPokemon changes
+   
     if (selectedPokemon) {
+      fetchEvolutionChain();
       fetchAbilities();
     }
   }, [selectedPokemon]);
+
+  const getStatPercentage = (statValue) => {
+    //mess with this to make the pokemon stats look more green or not
+    const maxStatValue = 70;
+    const fullWidth = 50; // 
+    const percentage = (statValue / maxStatValue) * fullWidth;
+    return Math.max(percentage, 10);
+  };
 
   return (
     <div>
@@ -140,35 +86,33 @@ const fetchAbilities = async () => {
           <li key={evolution.id}>{capitalizeEachWord(evolution.name)}</li>
         ))}
       </ul>
-      <h3>Moveset:</h3>
-      <ul>
-        {moveset.map((move, index) => (
-          <li key={index}>{capitalizeEachWord(move)}</li>
-        ))}
-      </ul>
-      <h3>Base Stat Total: {baseStatTotal}</h3>
+
       <div>
         <h3>Abilities:</h3>
-        
         <ul>
-        {selectedPokemon.abilities.map((ability, index) => (
-          <li key={index}>
-            {capitalizeEachWord(ability)}
-          </li>
-        ))}
-      
-
+          {abilities.map((ability, index) => (
+            <li key={index}>{capitalizeEachWord(ability.name)}</li>
+          ))}
         </ul>
 
         <h3>Individual Stats:</h3>
-      <ul>
-        <li>HP: {selectedPokemon.stats.find(stat => stat.name === 'hp').value}</li>
-        <li>Attack: {selectedPokemon.stats.find(stat => stat.name === 'attack').value}</li>
-        <li>Defense: {selectedPokemon.stats.find(stat => stat.name === 'defense').value}</li>
-        <li>Special Attack: {selectedPokemon.stats.find(stat => stat.name === 'special-attack').value}</li>
-        <li>Special Defense: {selectedPokemon.stats.find(stat => stat.name === 'special-defense').value}</li>
-        <li>Speed: {selectedPokemon.stats.find(stat => stat.name === 'speed').value}</li>
-      </ul>
+        <ul>
+          {selectedPokemon.stats.map((stat, index) => (
+            <li key={index}>
+              {capitalizeEachWord(stat.name)}: {stat.value}
+              <div style={{ width: "50%", backgroundColor: "#ddd", borderRadius: "5px", marginTop: "5px" }}>
+                <div
+                  style={{
+                    width: `${getStatPercentage(stat.value)}%`,
+                    height: "20px",
+                    backgroundColor: "#4CAF50",
+                    borderRadius: "5px",
+                  }}
+                ></div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <button onClick={onBackClick}>Back to Pokedex</button>
