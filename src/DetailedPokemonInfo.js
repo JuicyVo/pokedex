@@ -18,6 +18,11 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
   const [evolutionChain, setEvolutionChain] = useState([]);
   const [abilities, setAbilities] = useState([]);
 
+  const getMiddlePokedexEntry = () => {
+    const middleIndex = Math.floor(selectedPokemon.pokedexEntries.length / 2);
+    return selectedPokemon.pokedexEntries[middleIndex];
+  };
+
   useEffect(() => {
     const fetchEvolutionChain = async () => {
       try {
@@ -98,6 +103,8 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
           ))}
         </div>
       </div>
+      <h3>Pokedex Entry:</h3>
+      <p>{getMiddlePokedexEntry()}</p>
       <h3>Evolution Chain:</h3>
       <ul>
         {evolutionChain.map((evolution) => (

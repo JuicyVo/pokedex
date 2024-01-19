@@ -9,7 +9,7 @@ function capitalizeEachWord(str) {
 
 function getTypeIconSrc(type) {
   const iconPath = `/icons/pokemon/types/${type}.png`;
-  console.log('Icon Path:', iconPath);
+  // console.log('Icon Path:', iconPath);
   return iconPath;
 }
 

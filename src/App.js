@@ -26,7 +26,12 @@ function App() {
           const abilities = pokemonDetailResponse.data.abilities.map(ability => ability.ability.name);
 
           const types = pokemonDetailResponse.data.types.map(type => type.type.name);
-          const id = pokemonDetailResponse.data.id; 
+          const id = pokemonDetailResponse.data.id;
+          
+          // Fetch Pokedex entry information
+          const speciesResponse = await axios.get(pokemonDetailResponse.data.species.url);
+          const flavorTextEntries = speciesResponse.data.flavor_text_entries.filter(entry => entry.language.name === "en");
+          
           return {
             id, 
             name: capitalizeFirstLetter(p.name),
@@ -40,6 +45,7 @@ function App() {
             },
             stats,
             abilities,
+            pokedexEntries: flavorTextEntries.map(entry => entry.flavor_text),
           };
         }));
         setAllPokemon(pokemonData);
