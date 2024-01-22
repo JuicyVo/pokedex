@@ -1,6 +1,6 @@
 const Header = () => {
   return(
-    <header>
+    <header style={{ textAlign: 'center' }}>
       <h1>Pokedex</h1>
     </header>
   )
