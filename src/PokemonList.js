@@ -1,4 +1,5 @@
 import React from "react";
+import "./PokemonList.css"; 
 
 function capitalizeEachWord(str) {
   return str
@@ -13,17 +14,30 @@ function getTypeIconSrc(type) {
   return iconPath;
 }
 
+
+
 function PokemonList({ pokemon, onPokemonClick }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+    <div className="pokemon-list">
       {pokemon.map((p) => (
-        <div key={p.id} style={{ textAlign: 'center', padding: '16px', border: '1px solid #ccc', borderRadius: '8px' }}
-          onClick={() => onPokemonClick(p)}>
-          <img src={p.sprite} alt={p.name} style={{ maxWidth: '100%', height: 'auto' }} />
-          <h3 style={{ marginTop: '8px' }}>{p.name}</h3>
-          <div style={{ marginTop: '8px' }}>
+        <div
+          key={p.id}
+          className="pokemon-card"
+          onClick={() => onPokemonClick(p)}
+          type={p.types[0]}
+        >
+          <img src={p.sprite} alt={p.name} className="pokemon-image" />
+          <h3 className="pokemon-name" style={{ marginTop: '8px' }}>
+            {p.name}
+          </h3>
+          <div className="types" style={{ marginTop: '8px' }}>
             {p.types.map((type) => (
-              <img key={type} src={getTypeIconSrc(type)} alt={type} style={{ maxWidth: '24px', height: 'auto', marginRight: '4px' }} />
+              <img
+                key={type}
+                src={getTypeIconSrc(type)}
+                alt={type}
+                style={{ maxWidth: '24px', height: 'auto', marginRight: '4px' }}
+              />
             ))}
           </div>
         </div>
@@ -31,6 +45,5 @@ function PokemonList({ pokemon, onPokemonClick }) {
     </div>
   );
 }
-
 
 export default PokemonList;

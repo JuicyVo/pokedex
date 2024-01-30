@@ -144,9 +144,11 @@ function DetailedPokemonInfo({ selectedPokemon, onBackClick, onPreviousClick, on
           ))}
         </ul>
       </div>
+      <div  style={{ textAlign: 'center' }}>
       <button onClick={onBackClick}>Back to Pokedex</button>
       <button onClick={onPreviousClick}>Previous Pokemon</button>
       <button onClick={onNextClick}>Next Pokemon</button>
+    </div>
     </div>
   );
 }

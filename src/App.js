@@ -9,6 +9,23 @@ function App() {
   const [filteredPokemon, setFilteredPokemon] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPokemon, setSelectedPokemon] = useState(null);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+
+  const [popupTop, setPopupTop] = useState("50%");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isPopupVisible) {
+        setPopupTop(`calc(50% + ${window.scrollY}px)`);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isPopupVisible]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +34,6 @@ function App() {
         const pokemonData = await Promise.all(response.data.results.map(async (p) => {
           const pokemonDetailResponse = await axios.get(p.url);
 
-  
           const stats = pokemonDetailResponse.data.stats.map(stat => ({
             name: stat.stat.name,
             value: stat.base_stat,
@@ -27,13 +43,12 @@ function App() {
 
           const types = pokemonDetailResponse.data.types.map(type => type.type.name);
           const id = pokemonDetailResponse.data.id;
-          
-          // Fetch Pokedex entry information
+
           const speciesResponse = await axios.get(pokemonDetailResponse.data.species.url);
           const flavorTextEntries = speciesResponse.data.flavor_text_entries.filter(entry => entry.language.name === "en");
-          
+
           return {
-            id, 
+            id,
             name: capitalizeFirstLetter(p.name),
             sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
             types,
@@ -54,7 +69,7 @@ function App() {
         console.error("Error fetching data:", error.message);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -76,12 +91,18 @@ function App() {
   };
 
   const handlePokemonClick = (pokemon) => {
-    console.log('Clicked on Pokemon:', pokemon);
     setSelectedPokemon({ ...pokemon });
+    setPopupVisible(true);
+    window.scrollTo({
+      top: 0,
+      behavior: "auto", // change auto or smooth
+    });
+  
   };
 
   const handleBackClick = () => {
     setSelectedPokemon(null);
+    setPopupVisible(false);
   };
 
   const handleNextClick = () => {
@@ -99,24 +120,34 @@ function App() {
   return (
     <>
       <Header />
-      <div>
-        <input
-          type="text"
-          placeholder="Search Pokémon or Type..."
-          value={searchTerm}
-          onChange={handleSearch}
-        />
+  <div style={{ textAlign: 'center', padding: '16px 0' }}>
+    <input
+      type="text"
+      placeholder="Search Pokémon or Type..."
+      value={searchTerm}
+      onChange={handleSearch}
+    />
       </div>
-      {selectedPokemon ? (
-        <DetailedPokemonInfo
-          selectedPokemon={selectedPokemon}
-          onBackClick={handleBackClick}
-          onPreviousClick={handlePreviousClick}
-          onNextClick={handleNextClick}
-        />
-      ) : (
-        <PokemonList pokemon={filteredPokemon} onPokemonClick={handlePokemonClick} />
+      {selectedPokemon && (
+        <>
+          {isPopupVisible && (
+            <div className="overlay">
+              <div
+                className="popup-content"
+                style={{ top: popupTop }}
+              >
+                <DetailedPokemonInfo
+                  selectedPokemon={selectedPokemon}
+                  onBackClick={handleBackClick}
+                  onPreviousClick={handlePreviousClick}
+                  onNextClick={handleNextClick}
+                />
+              </div>
+            </div>
+          )}
+        </>
       )}
+      <PokemonList pokemon={filteredPokemon} onPokemonClick={handlePokemonClick} />
     </>
   );
 }
